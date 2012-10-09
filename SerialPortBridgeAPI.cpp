@@ -30,7 +30,7 @@ SerialPortBridgeAPI::SerialPortBridgeAPI(const SerialPortBridgePtr& plugin, cons
 	registerMethod("writeInt", make_method(this, &SerialPortBridgeAPI::writeInt));
 	registerMethod("writeFloat", make_method(this, &SerialPortBridgeAPI::writeFloat));
 	registerMethod("writeBool", make_method(this, &SerialPortBridgeAPI::writeBool));
-    
+
     // Read-only property
     registerProperty("version",
                      make_property(this,
@@ -72,20 +72,26 @@ std::string SerialPortBridgeAPI::get_version()
     return FBSTRING_PLUGIN_VERSION;
 }
 
-
 long SerialPortBridgeAPI::open(const std::string& port) {
-    m_port = new serial_port(m_io,port);
-    //TODO: verifiy if port is open.
-    if (m_port->is_open()) {
-        //TODO HANDLE BAUD RATE as parameter
-        boost::asio::serial_port_base::baud_rate baud_option(9600);
-        m_port->set_option(baud_option); // set the baud rate after the port has been opened
-        read_start();
-        boost::thread t(boost::bind(&boost::asio::io_service::run, &m_io));
-        return 0;
+    try {
+        m_port = new serial_port(m_io,port);
+        if (m_port->is_open()) {
+            //TODO HANDLE BAUD RATE as parameter
+            //boost::asio::serial_port_base::baud_rate baud_option(9600);
+            //m_port->set_option(baud_option); // set the baud rate after the port has been opened
+            m_port->set_option( boost::asio::serial_port_base::parity() );     // default none
+            m_port->set_option( boost::asio::serial_port_base::character_size( 8 ) );
+            m_port->set_option( boost::asio::serial_port_base::stop_bits() );  // default one
+            m_port->set_option( boost::asio::serial_port_base::baud_rate(9600) );
+
+            read_start();
+            boost::thread t(boost::bind(&boost::asio::io_service::run, &m_io));
+            return 0;
+        }
+    } catch(boost::exception &e) {
+         //TODO: Handle Exceptions
+        return -1;
     }
-    //TODO: Handle Exceptions
-    return -1;
 }
 
 long SerialPortBridgeAPI::close(void) {
@@ -142,11 +148,11 @@ void SerialPortBridgeAPI::read_complete(const boost::system::error_code& error, 
     if (!error)
     { // read completed, so process the data
         m_read_msg[bytes_transferred] = '\0';
-        read_start(); // start waiting for another asynchronous read again
         fire_received(m_read_msg);
+        read_start(); // start waiting for another asynchronous read again
     }
     else
-        fire_received("ERROR");
+        fire_received("EXX");
 }
 
 

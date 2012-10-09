@@ -95,7 +95,7 @@ FB::JSAPIPtr SerialPortBridge::createJSAPI()
 
 bool SerialPortBridge::onMouseDown(FB::MouseDownEvent *evt, FB::PluginWindow *)
 {
-    //printf("Mouse down at: %d, %d\n", evt->m_x, evt->m_y);
+    //printf("Mouse down at: %d, %d\n", evt->m_x, evt->m_y);s
     return false;
 }
 
