@@ -74,6 +74,7 @@ void SerialPortBridge::shutdown()
     // object should be released here so that this object can be safely
     // destroyed. This is the last point that shared_from_this and weak_ptr
     // references to this object will be valid
+    FB::ptr_cast<SerialPortBridgeAPI>(getRootJSAPI())->close();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

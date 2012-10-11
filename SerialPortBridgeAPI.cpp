@@ -95,11 +95,11 @@ long SerialPortBridgeAPI::open(const std::string& port) {
 }
 
 long SerialPortBridgeAPI::close(void) {
-	long  lerror = ERROR_SUCCESS;
-    //TODO: implement close function
-//	StopListener(0);
-//	lerror = CSerial::Close();
-	return lerror;
+    if (m_port->is_open()) {
+        m_port->close();
+        return 0;
+    }
+    return -1;
 }
 
 long SerialPortBridgeAPI::write(const FB::variant& val) {
@@ -152,7 +152,7 @@ std::string SerialPortBridgeAPI::readUntil(const std::string delimiter)
     }
     return result;
 
-    
+
 //    ASYNCHRONOUS
 //    std::string result = "";
 //    m_read_result = RESULT_IN_PROGRESS;
